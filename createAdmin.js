@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 // Use localhost instead of 127.0.0.1 for better compatibility
-const MONGODB_URI = 'mongodb+srv://admin:admin123@cluster0.8x05n6z.mongodb.net/?appName=Cluster0';
+const MONGODB_URI = 'mongodb+srv://nursing:jadhavar1@cluster0.ykycbzj.mongodb.net/?appName=Cluster0';
 
 console.log('🔧 Using MongoDB URI:', MONGODB_URI);
 
