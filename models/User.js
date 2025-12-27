@@ -10,9 +10,7 @@ const UserSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique: true,
-        lowercase: true,
-        trim: true
+        unique: true
     },
     password: {
         type: String,
@@ -29,30 +27,14 @@ const UserSchema = new mongoose.Schema({
     }
 });
 
-// Fixed pre-save hook
 UserSchema.pre('save', async function(next) {
-    // Only hash the password if it has been modified (or is new)
-    if (!this.isModified('password')) {
-        return next();
-    }
-    
-    try {
-        // Generate salt and hash password
-        const salt = await bcrypt.genSalt(10);
-        this.password = await bcrypt.hash(this.password, salt);
-        next();
-    } catch (error) {
-        next(error);
-    }
+    if (!this.isModified('password')) return next();
+    this.password = await bcrypt.hash(this.password, 10);
+    next();
 });
 
-// Compare password method
-UserSchema.methods.comparePassword = async function(candidatePassword) {
-    try {
-        return await bcrypt.compare(candidatePassword, this.password);
-    } catch (error) {
-        throw error;
-    }
+UserSchema.methods.comparePassword = async function(password) {
+    return await bcrypt.compare(password, this.password);
 };
 
 module.exports = mongoose.model('User', UserSchema);
