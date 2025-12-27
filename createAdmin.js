@@ -8,7 +8,6 @@ async function createAdmin() {
         console.log('✅ MongoDB connected');
 
         const existingAdmin = await User.findOne({ email: 'admin@example.com' });
-
         if (existingAdmin) {
             console.log('⚠️ Admin already exists');
             process.exit(0);
@@ -17,13 +16,13 @@ async function createAdmin() {
         const admin = new User({
             username: 'admin',
             email: 'admin@example.com',
-            password: 'admin123', // 🔥 RAW password
+            password: 'admin123', // ✅ RAW PASSWORD ONLY
             role: 'admin'
         });
 
-        await admin.save();
+        await admin.save(); // 🔥 hashes password ONCE
 
-        console.log('🎉 ADMIN CREATED SUCCESSFULLY');
+        console.log('🎉 ADMIN CREATED');
         console.log('Email: admin@example.com');
         console.log('Password: admin123');
 
