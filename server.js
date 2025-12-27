@@ -11,33 +11,31 @@ connectDB();
 
 const app = express();
 
-// ====================== MIDDLEWARE ======================
-// FIX: Better CORS configuration
+// ====================== CORS CONFIG (SAFE & MODERN) ======================
 const allowedOrigins = [
     "http://localhost:5173",
-    "https://your-frontend-domain.vercel.app", // Add your actual frontend URL
     process.env.FRONTEND_URL
-].filter(Boolean); // Remove any undefined values
+].filter(Boolean); // remove undefined
 
 app.use(cors({
-    origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl requests)
+    origin: (origin, callback) => {
+        // allow requests with no origin (Postman, curl, server-to-server)
         if (!origin) return callback(null, true);
-        
-        if (allowedOrigins.indexOf(origin) === -1) {
-            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-            return callback(new Error(msg), false);
+
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
         }
-        return callback(null, true);
+
+        return callback(new Error('Not allowed by CORS'));
     },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Handle preflight requests
-app.options('*', cors());
+// ❌ DO NOT USE app.options('*', cors()) — breaks Node 22
 
+// ====================== BODY PARSERS ======================
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -59,18 +57,17 @@ app.get('/', (req, res) => {
 // ====================== ERROR HANDLER ======================
 app.use((err, req, res, next) => {
     console.error('ERROR:', err.message);
-    
-    // Handle CORS errors
-    if (err.message.includes('CORS')) {
+
+    if (err.message === 'Not allowed by CORS') {
         return res.status(403).json({
             success: false,
-            message: 'CORS Error: Request blocked'
+            message: 'CORS Error: Origin not allowed'
         });
     }
 
-    res.status(err.status || 500).json({
+    res.status(500).json({
         success: false,
-        message: err.message || 'Internal Server Error'
+        message: 'Internal Server Error'
     });
 });
 
