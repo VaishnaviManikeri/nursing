@@ -3,17 +3,20 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 
-// Load environment variables
+// ====================== LOAD ENV ======================
 dotenv.config();
 
-// Connect MongoDB
+// ====================== CONNECT DB ======================
 connectDB();
 
 const app = express();
 
 // ====================== MIDDLEWARE ======================
 app.use(cors({
-    origin: '*', // you can restrict later to frontend domain
+    origin: [
+        "http://localhost:5173",                 // local frontend
+        process.env.FRONTEND_URL                // deployed frontend
+    ],
     credentials: true
 }));
 
